@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+audit.log
+.DS_Store
+replay-store.ndjson
+.402index-token
+# machine-local docker-volume config (container-owned, holds a local secret_key)
+searxng/settings.yml

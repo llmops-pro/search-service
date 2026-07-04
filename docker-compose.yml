@@ -1,0 +1,27 @@
+# Local dev: search-service + a SearXNG backend with the JSON API on.
+# `docker compose up` then GET http://localhost:8088/search?q=test
+services:
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "8080:8080"
+    environment:
+      # Enable the JSON format the client needs (also set in settings.yml volume).
+      SEARXNG_BASE_URL: "http://localhost:8080/"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    # NOTE: ensure ./searxng/settings.yml has:  search: { formats: [html, json] }
+
+  search-service:
+    build: .
+    ports:
+      - "8088:8080"
+    environment:
+      PORT: "8080"
+      SEARXNG_URL: "http://searxng:8080"
+      PRICE_SATS: "50"
+      MACAROON_TTL_SECONDS: "900"
+    env_file:
+      - .env # supplies RECEIVE_NWC_CONNECTION_STRING + MACAROON_SECRET
+    depends_on:
+      - searxng

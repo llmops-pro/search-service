@@ -1,0 +1,41 @@
+# Fly.io deploy for search-service. The RECEIVE-ONLY NWC string + MACAROON_SECRET
+# go in Fly secrets, NOT here:
+#   fly secrets set RECEIVE_NWC_CONNECTION_STRING="nostr+walletconnect://..." \
+#                   MACAROON_SECRET="$(node -e 'console.log(require(\"crypto\").randomBytes(32).toString(\"hex\"))')" \
+#                   SEARXNG_URL="https://<your-searxng>.fly.dev"
+#
+# SearXNG runs as a SEPARATE Fly app (or any reachable instance). Only the
+# receive-only invoice key lives on this box — never a spend key or nsec.
+
+app = "llmops-search"
+primary_region = "ams"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  PRICE_SATS = "50"
+  MACAROON_TTL_SECONDS = "900"
+  # Audit to stderr so events stream into `fly logs` (machine FS is ephemeral).
+  AUDIT_LOG_PATH = "/dev/stderr"
+  # Ephemeral by design: combined with the 900s macaroon TTL the replay window
+  # on a redeploy is bounded. Move to a volume if TTLs ever grow.
+  REPLAY_STORE_PATH = "/tmp/replay-store.ndjson"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
