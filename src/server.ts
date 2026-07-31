@@ -171,6 +171,10 @@ app.get("/search", async (c) => {
   }
 });
 
+const warmupStarted = Date.now();
+await gate.warmUp();
+audit.record("nwc_warmup", { duration_ms: Date.now() - warmupStarted });
+
 serve({ fetch: app.fetch, port: config.PORT }, (info) => {
   audit.record("startup", {
     port: info.port,

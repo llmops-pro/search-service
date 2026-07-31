@@ -4,6 +4,7 @@ import { appendFileSync } from "node:fs";
 
 export type AuditEvent =
   | "startup"
+  | "nwc_warmup"
   | "challenge_issued"
   | "paid_search"
   | "replay_rejected"
