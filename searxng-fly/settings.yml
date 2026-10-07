@@ -9,3 +9,11 @@ search:
   formats:
     - html
     - json
+# Fly datacenter IPs get CAPTCHA'd / rate-limited by the default web engines
+# (brave, duckduckgo, startpage) — on 2026-10-07 every query returned 0 results.
+# bing + yandex answer from Fly; enable them as fallbacks so paid searches aren't empty.
+engines:
+  - name: bing
+    disabled: false
+  - name: yandex
+    disabled: false

@@ -26,7 +26,11 @@ primary_region = "ams"
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = "suspend"
+  # "stop", not "suspend": a suspended process keeps its NWC relay websocket in
+  # memory, and that socket goes dead while frozen — on 2026-10-07 the process had
+  # been resumed from suspend since 2026-08-10 and every make_invoice failed with
+  # "publish timeout". A stop means each wake is a fresh boot, so warmUp() reconnects.
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
 
