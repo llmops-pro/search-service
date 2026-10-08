@@ -30,9 +30,12 @@ primary_region = "ams"
   # memory, and that socket goes dead while frozen — on 2026-10-07 the process had
   # been resumed from suspend since 2026-08-10 and every make_invoice failed with
   # "publish timeout". A stop means each wake is a fresh boot, so warmUp() reconnects.
+  # min 1: a cold boot (fresh process + NWC relay warmUp) takes ~15 s, too slow for
+  # 402index probes and impatient agents; warm requests answer in <1 s (2026-10-08).
+  # "stop" still applies to any machine above the minimum.
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [[http_service.checks]]
     interval = "30s"
